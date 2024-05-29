@@ -53,7 +53,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELD = ['username']
 
-    objects = UserManager()
+    # objects = UserManager()
 
     groups = models.ManyToManyField(Group, verbose_name=(
         'groups'), blank=True, related_name='authentication_users')
