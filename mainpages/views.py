@@ -1,7 +1,8 @@
 from django.shortcuts import render
-from .models import Foods#, Notification
-from .serializer import FoodsSerializer, UserSerializer, RegisterSerializer#, NotificationSerializer
-from rest_framework import status, filters, viewsets, generics#, views
+from .models import Foods  # , Notification
+# , NotificationSerializer
+from .serializer import FoodsSerializer, UserSerializer, RegisterSerializer
+from rest_framework import status, filters, viewsets, generics  # , views
 # from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -94,7 +95,6 @@ class RegisterView(generics.GenericAPIView):
         return Response(user_data, status=status.HTTP_201_CREATED)
 
 
-
 class generics_list(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -108,3 +108,38 @@ class generics_pk(generics.RetrieveUpdateDestroyAPIView):
 class generics_food_list(generics.ListAPIView):
     queryset = Foods.objects.all()
     serializer_class = FoodsSerializer
+
+
+ACTIVITY_FACTORS = {
+    "high": 1.75,
+    "normal": 1.5,
+    "low": 1.2,
+}
+
+GENDER_FACTOR = {"female": 1.2}  # Factor for females
+
+
+class CalculateCalories(APIView):
+    def post(self, request):
+        try:
+            weight = float(request.data["weight"])
+            activity = request.data["activity"].lower()
+
+            if activity not in ACTIVITY_FACTORS:
+                return Response(
+                    "Invalid activity level. Please enter 'High', 'Normal', or 'Low'.",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            activity_factor = ACTIVITY_FACTORS[activity]
+            gender_factor = GENDER_FACTOR.get(
+                request.data["gender"].lower(), 1)
+
+            calories = 24 * activity_factor * weight * gender_factor
+            return Response(calories, status=status.HTTP_201_CREATED)
+
+        except (ValueError, KeyError):
+            return Response(
+                "Invalid input. Please check data types and format.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )

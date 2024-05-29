@@ -3,6 +3,7 @@ from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin, Group)
 # from django.core import import_export
 
+
 class Foods(models.Model):
     name = models.CharField(max_length=200)
     calories = models.CharField(max_length=200, null=True)
@@ -28,23 +29,26 @@ class UserManager(BaseUserManager):
 
         return user
 
-    # def create_superuser(self, username, email, password=None):
+    def create_superuser(self, username, email, password=None):
 
-    #     if password is None:
-    #         raise TypeError('Password should not be none')
+        if password is None:
+            raise TypeError('Password should not be none')
 
-    #     user = self.create_user(username, email, password)
-    #     user.is_superuser = True
-    #     user.is_staff = True
-    #     return user
-
-
+        user = self.create_user(username, email, password)
+        user.is_superuser = True
+        user.is_staff = True
+        return user
 
 
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255, unique=True, db_index=True)
     email = models.EmailField(max_length=255, unique=True, db_index=True)
-    
+
+    age = models.IntegerField(blank=True, null=True)
+    gender = models.CharField(max_length=6, blank=True, null=True)
+    weight = models.FloatField(blank=True, null=True)
+    activity = models.CharField(max_length=255, blank=True)
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELD = ['username']
 
@@ -62,5 +66,3 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def str(self):
         return self.email
-
-

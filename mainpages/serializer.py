@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Foods  
+from .models import Foods
 from django.contrib.auth.models import User
 
 
@@ -38,6 +38,6 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'password')
+        fields = ('id', 'email', 'username',
+                  'password', 'age', 'gender', 'weight', 'activity')
         extra_kwargs = {'password': {'write_only': True, 'required': True}}
-
