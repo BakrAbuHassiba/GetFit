@@ -9,6 +9,7 @@ class Foods(models.Model):
     calories = models.CharField(max_length=200, null=True)
     Protien = models.CharField(max_length=100, null=True)
     Fats = models.CharField(max_length=100, null=True)
+    # likes = models.IntegerField(blank=True, null=False)
 
     def __str__(self):
         return self.name
@@ -44,7 +45,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255, unique=True, db_index=True)
     email = models.EmailField(max_length=255, unique=True, db_index=True)
 
-    age = models.IntegerField(blank=True, null=True)
+    # age = models.IntegerField(blank=True, null=True)
     gender = models.CharField(max_length=6, blank=True, null=True)
     weight = models.FloatField(blank=True, null=True)
     activity = models.CharField(max_length=255, blank=True)
