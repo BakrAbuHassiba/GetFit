@@ -3,60 +3,46 @@ from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin, Group)
 
 
-class Foods(models.Model):
-    FoodName = models.CharField(max_length=200, unique=True)
-    # LinkDrive = models.ImageField(upload_to='foods_images/')
-    LinkDrive = models.CharField(max_length=500, default=0)
-    TheDescription = models.CharField(max_length=400, default=0)
-    YoutubeLink = models.CharField(max_length=200, default=0)
-
-    Calories = models.FloatField(blank=False, null=False, default=0)
-    Protein = models.FloatField(blank=False, null=False, default=0)
-    Fats = models.FloatField(blank=False, null=False, default=0)
-    Carbs = models.FloatField(blank=False, null=False, default=0)
-
-    def __str__(self):
-        return self.FoodName
-
-
 class UserManager(BaseUserManager):
 
-    def create_user(self, username, email, password=None):
-
-        if username is None:
-            raise TypeError('Users should have a username')
-        if email is None:
-            raise TypeError('Users should have a Email')
-
-        user = self.model(username=username, email=self.normalize_email(email))
+    def create_user(self, email, username, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, username=username, **extra_fields)
         user.set_password(password)
-        user.save()
-
+        user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, email, password=None):
+    def create_superuser(self, email, username, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
 
-        if password is None:
-            raise TypeError('Password should not be none')
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
 
-        user = self.create_user(username, email, password)
-        user.is_superuser = True
-        user.is_staff = True
-        return user
+        return self.create_user(email, username, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255, unique=True, db_index=True)
-    email = models.EmailField(max_length=255, unique=True, db_index=True)
-    image = models.ImageField(default='default.jpg', upload_to='images')
+    email = models.EmailField(
+        max_length=255, unique=True, db_index=True, blank=True, null=True)
+    image = models.ImageField(default='default.jpg',
+                              upload_to='images', blank=True, null=True)
     gender = models.CharField(max_length=6, blank=True, null=True)
     weight = models.FloatField(blank=True, null=True)
     activity = models.CharField(max_length=255, blank=True, null=True)
+    is_staff = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+    is_superuser = models.BooleanField(default=False)
+
+    objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELD = ['username']
-
-    # objects = UserManager()
+    REQUIRED_FIELDS = ['username']
 
     groups = models.ManyToManyField(Group, verbose_name=(
         'groups'), blank=True, related_name='authentication_users')
@@ -68,5 +54,23 @@ class User(AbstractBaseUser, PermissionsMixin):
         related_name='authentication_users',
     )
 
-    def str(self):
+    def __str__(self):
         return self.email
+
+
+class Foods(models.Model):
+    FoodName = models.CharField(max_length=200, unique=True)
+    # LinkDrive = models.ImageField(upload_to='foods_images/')
+    LinkDrive = models.CharField(max_length=500, default=0)
+    TheDescription = models.CharField(max_length=400, default=0)
+    YoutubeLink = models.CharField(max_length=200, default=0)
+
+    Calories = models.FloatField(blank=False, null=False, default=0)
+    Protein = models.FloatField(blank=False, null=False, default=0)
+    Fats = models.FloatField(blank=False, null=False, default=0)
+    Carbs = models.FloatField(blank=False, null=False, default=0)
+    likes = models.ManyToManyField(
+        User, related_name='liked_foods', blank=True)  # New field for likes
+
+    def __str__(self):
+        return self.FoodName

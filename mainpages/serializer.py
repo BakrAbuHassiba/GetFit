@@ -1,12 +1,5 @@
 from rest_framework import serializers
-from .models import Foods
-from django.contrib.auth.models import User
-
-
-class FoodsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Foods
-        fields = '__all__'
+from .models import Foods, User
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -15,7 +8,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['email', 'username', 'password']
+        fields = "__all__"
 
     def validate(self, attrs):
         email = attrs.get('email', '')
@@ -32,7 +25,16 @@ class RegisterSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        groups = validated_data.pop('groups', None)
+        user_permissions = validated_data.pop('user_permissions', None)
+        user = User.objects.create_user(**validated_data)
+
+        if groups:
+            user.groups.set(groups)
+        if user_permissions:
+            user.user_permissions.set(user_permissions)
+
+        return user
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -41,3 +43,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'email', 'username',
                   'password', 'gender', 'weight', 'activity')
         extra_kwargs = {'password': {'write_only': True, 'required': True}}
+
+
+class FoodsSerializer(serializers.ModelSerializer):
+    likes = UserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Foods
+        fields = '__all__'

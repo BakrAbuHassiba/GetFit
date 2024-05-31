@@ -1,10 +1,8 @@
-from .models import Foods
+from .models import Foods, User
 from .serializer import FoodsSerializer, UserSerializer, RegisterSerializer
 from rest_framework import status, generics
-# from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth.models import User
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.decorators import api_view
 import jwt
@@ -93,7 +91,7 @@ class RegisterView(generics.GenericAPIView):
 
         user_data = serializer.data
         user = User.objects.get(email=user_data['email'])
-        return Response(user_data, status=status.HTTP_201_CREATED)
+        return Response(user, status=status.HTTP_201_CREATED)
 
 
 class generics_list(generics.ListAPIView):
@@ -117,7 +115,7 @@ ACTIVITY_FACTORS = {
     "low": 1.2,
 }
 
-GENDER_FACTOR = {"female": 1.2}  # Factor for females
+GENDER_FACTOR = {"female": 1.2} 
 
 
 class CalculateCalories(APIView):
@@ -180,10 +178,33 @@ class GetFoodView(APIView):
             return Response({'error': 'Multiple foods found with the same name'}, status=400)
 
 
-# @api_view(['GET'])
-# def find_food(request):
-#     foods =Foods.objects.filter(
-#         FoodName=request.data['FoodName'],
-#     )
-#     serializer = FoodsSerializer(foods, many=True)
-#     return Response(serializer.data)
+@api_view(['POST'])
+def like_food(request, food_id, user_id):
+    try:
+        food = Foods.objects.get(pk=food_id)
+        user = User.objects.get(pk=user_id)
+    except (Foods.DoesNotExist, User.DoesNotExist):
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if user in food.likes.all():
+        food.likes.remove(user)
+        message = 'You have unliked this food.'
+    else:
+        food.likes.add(user)
+        message = 'You have liked this food.'
+
+    food.save()
+    serializer = FoodsSerializer(food)
+    return Response({'message': message, 'food': serializer.data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def user_liked_foods(request, user_id):
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    liked_foods = Foods.objects.filter(likes=user)
+    serializer = FoodsSerializer(liked_foods, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
