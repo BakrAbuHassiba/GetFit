@@ -34,6 +34,8 @@ class User(AbstractBaseUser, PermissionsMixin):
                               upload_to='images', blank=True, null=True)
     gender = models.CharField(max_length=6, blank=True, null=True)
     weight = models.FloatField(blank=True, null=True)
+    # height = models.FloatField(blank=True, null=True)
+    # ideal_weight = models.FloatField(blank=True, null=True)
     activity = models.CharField(max_length=255, blank=True, null=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

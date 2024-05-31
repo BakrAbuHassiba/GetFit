@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from .models import Foods, User
 from .serializer import FoodsSerializer, UserSerializer, RegisterSerializer
 from rest_framework import status, generics
@@ -7,11 +8,11 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.decorators import api_view
 import jwt
 import datetime
-from rest_framework import viewsets, filters
+from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 
-class FoodsListView(generics.ListAPIView):
+class FoodsSearchView(generics.ListAPIView):
     queryset = Foods.objects.all()
     serializer_class = FoodsSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
@@ -89,9 +90,10 @@ class RegisterView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        user_data = serializer.data
-        user = User.objects.get(email=user_data['email'])
-        return Response(user, status=status.HTTP_201_CREATED)
+        # user_data = serializer.data
+        # user = User.objects.get(email=user_data['email'])
+        # return Response(user, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class generics_list(generics.ListAPIView):
@@ -115,7 +117,7 @@ ACTIVITY_FACTORS = {
     "low": 1.2,
 }
 
-GENDER_FACTOR = {"female": 1.2} 
+GENDER_FACTOR = {"female": 1.2}
 
 
 class CalculateCalories(APIView):
@@ -152,30 +154,16 @@ class GetUsernameView(APIView):
             return Response(username)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=404)
-    # def get(self, request):
-    #     user = request.user  # Assuming user is authenticated
-    #     username = user.username
-    #     return Response({'username': username})
 
 
-class FoodsView(APIView):
-    def get(self, request):
-        foods = Foods.objects.all()
-        serializer = FoodsSerializer(foods, many=True)
-        return Response(serializer.data)
-
-
-class GetFoodView(APIView):
+class GetFoodByFoodName(APIView):
     def get(self, request, FoodName):
         try:
             food = Foods.objects.get(FoodName=FoodName)
-            # Assuming you have a FoodSerializer
             serializer = FoodsSerializer(food)
             return Response(serializer.data)
         except Foods.DoesNotExist:
             return Response({'error': 'Food not found'}, status=404)
-        except Foods.MultipleObjectsReturned:
-            return Response({'error': 'Multiple foods found with the same name'}, status=400)
 
 
 @api_view(['POST'])
