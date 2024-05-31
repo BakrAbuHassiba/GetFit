@@ -4,10 +4,16 @@ from django.contrib.auth.models import (
 
 
 class Foods(models.Model):
-    FoodName = models.CharField(max_length=200)
-    calories = models.CharField(max_length=200, null=True)
-    Protien = models.CharField(max_length=100, null=True)
-    Fats = models.CharField(max_length=100, null=True)
+    FoodName = models.CharField(max_length=200, unique=True)
+    # LinkDrive = models.ImageField(upload_to='foods_images/')
+    LinkDrive = models.CharField(max_length=500, default=0)
+    TheDescription = models.CharField(max_length=400, default=0)
+    YoutubeLink = models.CharField(max_length=200, default=0)
+
+    Calories = models.FloatField(blank=False, null=False, default=0)
+    Protein = models.FloatField(blank=False, null=False, default=0)
+    Fats = models.FloatField(blank=False, null=False, default=0)
+    Carbs = models.FloatField(blank=False, null=False, default=0)
 
     def __str__(self):
         return self.FoodName
@@ -42,8 +48,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255, unique=True, db_index=True)
     email = models.EmailField(max_length=255, unique=True, db_index=True)
-    # image = models.ImageField(default='default.jpg', upload_to='images')
-    # age = models.IntegerField(blank=True, null=True)
+    image = models.ImageField(default='default.jpg', upload_to='images')
     gender = models.CharField(max_length=6, blank=True, null=True)
     weight = models.FloatField(blank=True, null=True)
     activity = models.CharField(max_length=255, blank=True, null=True)

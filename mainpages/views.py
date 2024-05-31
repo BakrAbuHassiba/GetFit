@@ -29,8 +29,10 @@ class LoginView(APIView):
         if user is None:
             raise AuthenticationFailed('User not found!')
 
+        # if user.username != username:
+        #     raise AuthenticationFailed('Incorrect Email or Password!')
         if not user.check_password(password):
-            raise AuthenticationFailed('Incorrect password!')
+            raise AuthenticationFailed('Incorrect Email or Password!')
         payload = {
             'id': user.id,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
@@ -154,6 +156,26 @@ class GetUsernameView(APIView):
     #     user = request.user  # Assuming user is authenticated
     #     username = user.username
     #     return Response({'username': username})
+
+
+class FoodsView(APIView):
+    def get(self, request):
+        foods = Foods.objects.all()
+        serializer = FoodsSerializer(foods, many=True)
+        return Response(serializer.data)
+
+
+class GetFoodView(APIView):
+    def get(self, request, FoodName):
+        try:
+            food = Foods.objects.get(FoodName=FoodName)
+            # Assuming you have a FoodSerializer
+            serializer = FoodsSerializer(food)
+            return Response(serializer.data)
+        except Foods.DoesNotExist:
+            return Response({'error': 'Food not found'}, status=404)
+        except Foods.MultipleObjectsReturned:
+            return Response({'error': 'Multiple foods found with the same name'}, status=400)
 
 
 # @api_view(['GET'])
