@@ -1,10 +1,10 @@
 from django.urls import path
-from rest_framework import routers
-from django.conf.urls import include
-from .views import FoodsView, GetFoodView, LoginView, UserView, LogoutView, RegisterView,  generics_pk, generics_list, CalculateCalories, GetUsernameView
+# from rest_framework import routers
+# from django.conf.urls import include
+from .views import FoodsView, GetFoodView, LoginView, UserView, LogoutView, RegisterView,  generics_pk, generics_list, CalculateCalories, GetUsernameView, FoodsListView
 
 # router = routers.DefaultRouter()
-# router.register('foods', Foods_veiwset)
+# router.register('foods', FoodsListView)
 
 urlpatterns = [
     # path('', include(router.urls)),
@@ -17,7 +17,8 @@ urlpatterns = [
     path('CalculateCalories/', CalculateCalories.as_view()),
     path('GetUsernameView/<str:username>/', GetUsernameView.as_view()),
     path('Foods/', FoodsView.as_view()),
-    path('GetFoodView/<str:FoodName>/', GetFoodView.as_view())
+    path('GetFoodView/<str:FoodName>/', GetFoodView.as_view()),
+    path('foods/', FoodsListView.as_view())
 
-    
+
 ]

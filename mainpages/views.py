@@ -9,14 +9,16 @@ from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.decorators import api_view
 import jwt
 import datetime
+from rest_framework import viewsets, filters
+from django_filters.rest_framework import DjangoFilterBackend
 
 
-# class Foods_veiwset(viewsets.ModelViewSet):
-#     queryset = Foods.objects.all()
-#     serializer_class = FoodsSerializer
-#     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-#     filterset_fields = ['name']
-#     search_fields = ['name']
+class FoodsListView(generics.ListAPIView):
+    queryset = Foods.objects.all()
+    serializer_class = FoodsSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['FoodName']
+    search_fields = ['FoodName']
 
 
 class LoginView(APIView):
