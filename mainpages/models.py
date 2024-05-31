@@ -1,18 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin, Group)
-# from django.core import import_export
 
 
 class Foods(models.Model):
-    name = models.CharField(max_length=200)
+    FoodName = models.CharField(max_length=200)
     calories = models.CharField(max_length=200, null=True)
     Protien = models.CharField(max_length=100, null=True)
     Fats = models.CharField(max_length=100, null=True)
-    # likes = models.IntegerField(blank=True, null=False)
 
     def __str__(self):
-        return self.name
+        return self.FoodName
 
 
 class UserManager(BaseUserManager):
@@ -44,11 +42,11 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255, unique=True, db_index=True)
     email = models.EmailField(max_length=255, unique=True, db_index=True)
-
+    # image = models.ImageField(default='default.jpg', upload_to='images')
     # age = models.IntegerField(blank=True, null=True)
     gender = models.CharField(max_length=6, blank=True, null=True)
     weight = models.FloatField(blank=True, null=True)
-    activity = models.CharField(max_length=255, blank=True)
+    activity = models.CharField(max_length=255, blank=True, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELD = ['username']

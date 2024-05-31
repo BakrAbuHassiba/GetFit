@@ -1,18 +1,14 @@
-from django.shortcuts import render
-from .models import Foods  # , Notification
-# , NotificationSerializer
+from .models import Foods
 from .serializer import FoodsSerializer, UserSerializer, RegisterSerializer
-from rest_framework import status, filters, viewsets, generics  # , views
+from rest_framework import status, generics
 # from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from rest_framework.exceptions import AuthenticationFailed
-# from django_filters.rest_framework import DjangoFilterBackend
-
+from rest_framework.decorators import api_view
 import jwt
 import datetime
-# from django.core import import_export
 
 
 # class Foods_veiwset(viewsets.ModelViewSet):
@@ -47,7 +43,8 @@ class LoginView(APIView):
 
         response.set_cookie(key='jwt', value=token, httponly=True)
         response.data = {
-            'jwt': token
+            'jwt': token,
+            'username': username
         }
         return response
 
@@ -143,3 +140,26 @@ class CalculateCalories(APIView):
                 "Invalid input. Please check data types and format.",
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+
+class GetUsernameView(APIView):
+    def get(self, request, username):
+        try:
+            user = User.objects.get(username=username)
+            username = user.username
+            return Response(username)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=404)
+    # def get(self, request):
+    #     user = request.user  # Assuming user is authenticated
+    #     username = user.username
+    #     return Response({'username': username})
+
+
+# @api_view(['GET'])
+# def find_food(request):
+#     foods =Foods.objects.filter(
+#         FoodName=request.data['FoodName'],
+#     )
+#     serializer = FoodsSerializer(foods, many=True)
+#     return Response(serializer.data)

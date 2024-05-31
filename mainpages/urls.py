@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework import routers
 from django.conf.urls import include
-from .views import LoginView, UserView, LogoutView, RegisterView,  generics_pk, generics_list, CalculateCalories
+from .views import LoginView, UserView, LogoutView, RegisterView,  generics_pk, generics_list, CalculateCalories, GetUsernameView
 
 # router = routers.DefaultRouter()
 # router.register('foods', Foods_veiwset)
@@ -15,5 +15,5 @@ urlpatterns = [
     path('delete_user/<int:pk>', generics_pk.as_view(), name='delete_user'),
     path('get/', generics_list.as_view(), name='get_users'),
     path('CalculateCalories/', CalculateCalories.as_view()),
+    path('GetUsernameView/<str:username>/', GetUsernameView.as_view())
 ]
-
