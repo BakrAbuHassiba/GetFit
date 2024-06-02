@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+# from django.contrib.auth import get_user_model
 from .models import Foods, User
 from .serializer import FoodsSerializer, UserSerializer, RegisterSerializer
 from rest_framework import status, generics
@@ -24,9 +24,9 @@ class LoginView(APIView):
     def post(self, request):
         username = request.data['username']
         password = request.data['password']
-
+        
         user = User.objects.filter(username=username).first()
-
+        id = user.id
         if user is None:
             raise AuthenticationFailed('User not found!')
 
@@ -47,7 +47,8 @@ class LoginView(APIView):
         response.set_cookie(key='jwt', value=token, httponly=True)
         response.data = {
             'jwt': token,
-            'username': username
+            'username': username,
+            "id":id
         }
         return response
 
@@ -156,6 +157,16 @@ class GetUsernameView(APIView):
             return Response({'error': 'User not found'}, status=404)
 
 
+class GetImageView(APIView):
+    def get(self, request, id):
+        try:
+            user = User.objects.get(id=id)
+            image_url = user.image.url if user.image else None
+            return Response({'image_url': image_url}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
 class GetFoodByFoodName(APIView):
     def get(self, request, FoodName):
         try:
@@ -196,3 +207,37 @@ def user_liked_foods(request, user_id):
     liked_foods = Foods.objects.filter(likes=user)
     serializer = FoodsSerializer(liked_foods, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UpdateProfileImageView(generics.UpdateAPIView):
+    serializer_class = UserSerializer
+
+    def get_object(self):
+        user_id = self.request.data.get('user_id')
+        
+        user = User.objects.get(id=user_id)
+        return user
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(
+            instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+
+
+@api_view(['POST'])
+def delete_user_likes(request, user_id):
+    try:
+        user = User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    liked_foods = Foods.objects.filter(likes=user)
+    for food in liked_foods:
+        food.likes.remove(user)
+        food.save()
+
+    return Response({'message': 'All likes have been removed for this user.'}, status=status.HTTP_200_OK)

@@ -1,8 +1,9 @@
 from django.urls import path
 # from rest_framework import routers
 # from django.conf.urls import include
-from .views import  like_food, generics_food_list, GetFoodByFoodName, LoginView, UserView, LogoutView, RegisterView,  generics_pk, generics_list, CalculateCalories, GetUsernameView, FoodsSearchView, user_liked_foods
-
+from .views import delete_user_likes, UpdateProfileImageView, GetImageView, like_food, generics_food_list, GetFoodByFoodName, LoginView, UserView, LogoutView, RegisterView,  generics_pk, generics_list, CalculateCalories, GetUsernameView, FoodsSearchView, user_liked_foods
+from django.conf import settings
+from django.conf.urls.static import static
 # router = routers.DefaultRouter()
 # router.register('foods', FoodsListView)
 
@@ -22,7 +23,13 @@ urlpatterns = [
          like_food, name='like-food'),
     path('user/<int:user_id>/liked_foods/',
          user_liked_foods, name='user-liked-foods'),
-
-
+    path('update-profile-image/', UpdateProfileImageView.as_view(),
+         name='update-profile-image'),
+    path('user-image/<int:id>/', GetImageView.as_view(), name='get-user-image'),
+      path('delete-user-likes/<int:user_id>/', delete_user_likes, name='delete-user-likes'),
 
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
