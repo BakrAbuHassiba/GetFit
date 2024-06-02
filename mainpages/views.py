@@ -117,34 +117,6 @@ ACTIVITY_FACTORS = {
     "low": 1.2,
 }
 
-# GENDER_FACTOR = {"female": 1.2}
-
-
-# class CalculateCalories(APIView):
-#     def post(self, request):
-#         try:
-#             weight = float(request.data["weight"])
-#             activity = request.data["activity"].lower()
-
-#             if activity not in ACTIVITY_FACTORS:
-#                 return Response(
-#                     "Invalid activity level. Please enter 'High', 'Normal', or 'Low'.",
-#                     status=status.HTTP_400_BAD_REQUEST,
-#                 )
-
-#             activity_factor = ACTIVITY_FACTORS[activity]
-#             gender_factor = GENDER_FACTOR.get(
-#                 request.data["gender"].lower(), 1)
-
-#             calories = 24 * activity_factor * weight * gender_factor
-#             return Response(calories, status=status.HTTP_201_CREATED)
-
-#         except (ValueError, KeyError):
-#             return Response(
-#                 "Invalid input. Please check data types and format.",
-#                 status=status.HTTP_400_BAD_REQUEST,
-#             )
-
 GENDER_FACTOR = {
     'male': 1,
     'female': 0.9
@@ -168,7 +140,6 @@ class CalculateCalories(APIView):
             activity_factor = ACTIVITY_FACTORS[activity]
             gender_factor = GENDER_FACTOR.get(gender, 1)
 
-            
             calories = 24 * activity_factor * weight * gender_factor
 
             # Convert height from cm to inches
@@ -266,7 +237,7 @@ class UpdateProfileImageView(generics.UpdateAPIView):
     serializer_class = UserSerializer
 
     def get_object(self):
-        user_id = self.request.data.get('user_id')
+        user_id = self.request.data.get('id')
 
         user = User.objects.get(id=user_id)
         return user
@@ -303,5 +274,3 @@ def delete_all_foods(request):
         food.likes.clear()  # Clear related likes
         food.delete()
     return Response({'message': 'All foods have been deleted.'}, status=status.HTTP_200_OK)
-
-
