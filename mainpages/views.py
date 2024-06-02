@@ -1,4 +1,3 @@
-# from django.contrib.auth import get_user_model
 from .models import Foods, User
 from .serializer import FoodsSerializer, UserSerializer, RegisterSerializer
 from rest_framework import status, generics
@@ -24,7 +23,7 @@ class LoginView(APIView):
     def post(self, request):
         username = request.data['username']
         password = request.data['password']
-        
+
         user = User.objects.filter(username=username).first()
         id = user.id
         if user is None:
@@ -48,7 +47,7 @@ class LoginView(APIView):
         response.data = {
             'jwt': token,
             'username': username,
-            "id":id
+            "id": id
         }
         return response
 
@@ -214,7 +213,7 @@ class UpdateProfileImageView(generics.UpdateAPIView):
 
     def get_object(self):
         user_id = self.request.data.get('user_id')
-        
+
         user = User.objects.get(id=user_id)
         return user
 
@@ -241,3 +240,12 @@ def delete_user_likes(request, user_id):
         food.save()
 
     return Response({'message': 'All likes have been removed for this user.'}, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+def delete_all_foods(request):
+    foods = Foods.objects.all()
+    for food in foods:
+        food.likes.clear()  # Clear related likes
+        food.delete()
+    return Response({'message': 'All foods have been deleted.'}, status=status.HTTP_200_OK)
