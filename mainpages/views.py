@@ -117,14 +117,47 @@ ACTIVITY_FACTORS = {
     "low": 1.2,
 }
 
-GENDER_FACTOR = {"female": 1.2}
+# GENDER_FACTOR = {"female": 1.2}
+
+
+# class CalculateCalories(APIView):
+#     def post(self, request):
+#         try:
+#             weight = float(request.data["weight"])
+#             activity = request.data["activity"].lower()
+
+#             if activity not in ACTIVITY_FACTORS:
+#                 return Response(
+#                     "Invalid activity level. Please enter 'High', 'Normal', or 'Low'.",
+#                     status=status.HTTP_400_BAD_REQUEST,
+#                 )
+
+#             activity_factor = ACTIVITY_FACTORS[activity]
+#             gender_factor = GENDER_FACTOR.get(
+#                 request.data["gender"].lower(), 1)
+
+#             calories = 24 * activity_factor * weight * gender_factor
+#             return Response(calories, status=status.HTTP_201_CREATED)
+
+#         except (ValueError, KeyError):
+#             return Response(
+#                 "Invalid input. Please check data types and format.",
+#                 status=status.HTTP_400_BAD_REQUEST,
+#             )
+
+GENDER_FACTOR = {
+    'male': 1,
+    'female': 0.9
+}
 
 
 class CalculateCalories(APIView):
     def post(self, request):
         try:
             weight = float(request.data["weight"])
+            height_cm = float(request.data["height"])
             activity = request.data["activity"].lower()
+            gender = request.data["gender"].lower()
 
             if activity not in ACTIVITY_FACTORS:
                 return Response(
@@ -133,11 +166,32 @@ class CalculateCalories(APIView):
                 )
 
             activity_factor = ACTIVITY_FACTORS[activity]
-            gender_factor = GENDER_FACTOR.get(
-                request.data["gender"].lower(), 1)
+            gender_factor = GENDER_FACTOR.get(gender, 1)
 
+            
             calories = 24 * activity_factor * weight * gender_factor
-            return Response(calories, status=status.HTTP_201_CREATED)
+
+            # Convert height from cm to inches
+            height_in = height_cm / 2.54
+
+            # Calculate ideal weight
+            if gender == 'male':
+                ideal_weight = 50 + 2.3 * \
+                    (height_in - 60)  # 60 inches = 5 feet
+            elif gender == 'female':
+                ideal_weight = 45.5 + 2.3 * (height_in - 60)
+            else:
+                return Response(
+                    "Invalid gender. Please enter 'male' or 'female'.",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            response_data = {
+                "calories": calories,
+                "ideal_weight": ideal_weight
+            }
+
+            return Response(response_data, status=status.HTTP_201_CREATED)
 
         except (ValueError, KeyError):
             return Response(
@@ -249,3 +303,5 @@ def delete_all_foods(request):
         food.likes.clear()  # Clear related likes
         food.delete()
     return Response({'message': 'All foods have been deleted.'}, status=status.HTTP_200_OK)
+
+
