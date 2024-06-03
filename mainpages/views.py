@@ -189,12 +189,44 @@ class CalculateCalories(APIView):
                 "Invalid input. Please check data types and format.",
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        except (ValueError, KeyError):
+        # except (ValueError, KeyError):
+        #     return Response(
+        #         "Invalid input. Please check data types and format.",
+        #         status=status.HTTP_400_BAD_REQUEST,
+        #     )
+
+
+class DeleteUserDataView(APIView):
+    def post(self, request):
+        try:
+            user_id = request.data.get("user_id")
+
+            try:
+                user = User.objects.get(id=user_id)
+            except User.DoesNotExist:
+                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+            # Set the fields to None or appropriate default values
+            user.weight = None
+            user.height = None
+            user.activity = None
+            user.gender = None
+            user.calories = None
+            user.ideal_weight = None
+            user.save()
+
+            return Response({'message': 'User data fields have been cleared.'}, status=status.HTTP_200_OK)
+
+        except KeyError:
             return Response(
-                "Invalid input. Please check data types and format.",
+                {"error": "User ID is required."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 class GetUsernameView(APIView):
     def get(self, request, username):
