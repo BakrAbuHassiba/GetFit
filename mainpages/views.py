@@ -156,7 +156,7 @@ class CalculateCalories(APIView):
                     "Invalid gender. Please enter 'male' or 'female'.",
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-
+            ideal_weight = round(ideal_weight, 2)
             response_data = {
                 "calories": calories,
                 "ideal_weight": ideal_weight
