@@ -64,8 +64,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Foods(models.Model):
     FoodName = models.CharField(max_length=200, unique=True)
-    # LinkDrive = models.ImageField(upload_to='foods_images/')
-    LinkDrive = models.CharField(max_length=500, default='Images/bagel.jpg')
+    LinkDrive = models.ImageField(
+        upload_to='foods_images/', default='foods_images/bagel.jpg')
     TheDescription = models.CharField(max_length=400, default=0)
     YoutubeLink = models.CharField(max_length=200, default=0)
 

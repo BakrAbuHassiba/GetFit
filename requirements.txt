@@ -17,6 +17,7 @@ decorator==5.1.1
 diff-match-patch==20230430
 Django==4.2.6
 django-cors-headers==4.3.1
+django-filter==24.2
 django-import-export==4.0.6
 djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.1
@@ -64,6 +65,7 @@ pandas==1.5.3
 pandas-compat==0.1.1
 parso==0.8.3
 pickleshare==0.7.5
+pillow==10.3.0
 platformdirs==3.2.0
 plotly==5.15.0
 prompt-toolkit==3.0.38

@@ -109,6 +109,9 @@ class generics_pk(generics.RetrieveUpdateDestroyAPIView):
 class generics_food_list(generics.ListAPIView):
     queryset = Foods.objects.all()
     serializer_class = FoodsSerializer
+    
+    def get_serializer_context(self):
+        return {'request': self.request}
 
     # def get_serializer_context(self):
     #     context = super(generics_food_list, self).get_serializer_context()
@@ -275,6 +278,36 @@ class GetFoodByFoodName(APIView):
             return Response({'error': 'Food not found'}, status=404)
 
 
+# @api_view(['POST'])
+# def like_food(request, food_id, user_id):
+#     try:
+#         food = Foods.objects.get(pk=food_id)
+#         user = User.objects.get(pk=user_id)
+#     except (Foods.DoesNotExist, User.DoesNotExist):
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+
+#     if user in food.likes.all():
+#         food.likes.remove(user)
+#         message = 'You have unliked this food.'
+#     else:
+#         food.likes.add(user)
+#         message = 'You have liked this food.'
+
+#     food.save()
+#     serializer = FoodsSerializer(food)
+#     return Response({'message': message, 'food': serializer.data}, status=status.HTTP_200_OK)
+
+
+# @api_view(['GET'])
+# def user_liked_foods(request, user_id):
+#     try:
+#         user = User.objects.get(pk=user_id)
+#     except User.DoesNotExist:
+#         return Response(status=status.HTTP_404_NOT_FOUND)
+
+#     liked_foods = Foods.objects.filter(likes=user)
+#     serializer = FoodsSerializer(liked_foods, many=True)
+#     return Response(serializer.data, status=status.HTTP_200_OK)
 @api_view(['POST'])
 def like_food(request, food_id, user_id):
     try:
@@ -291,7 +324,7 @@ def like_food(request, food_id, user_id):
         message = 'You have liked this food.'
 
     food.save()
-    serializer = FoodsSerializer(food)
+    serializer = FoodsSerializer(food, context={'request': request})
     return Response({'message': message, 'food': serializer.data}, status=status.HTTP_200_OK)
 
 
@@ -303,7 +336,8 @@ def user_liked_foods(request, user_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     liked_foods = Foods.objects.filter(likes=user)
-    serializer = FoodsSerializer(liked_foods, many=True)
+    serializer = FoodsSerializer(
+        liked_foods, many=True, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 

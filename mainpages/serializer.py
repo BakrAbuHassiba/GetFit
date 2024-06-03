@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Foods, User
 from django.conf import settings
 
+
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         max_length=68, min_length=6, write_only=True)
@@ -42,22 +43,34 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         # fields = ('id', 'email', 'username',
         #           'password', 'gender', 'weight', 'activity')
-        fields ="__all__"
+        fields = "__all__"
         extra_kwargs = {'password': {'write_only': True, 'required': True}}
 
 
+# class FoodsSerializer(serializers.ModelSerializer):
+#     likes = UserSerializer(many=True, read_only=True)
+#     LinkDrive = serializers.SerializerMethodField()
+
+#     class Meta:
+#         model = Foods
+#         fields='__all__'
+#         # fields = ["id", 'FoodName', 'TheDescription', 'YoutubeLink',
+#         #           'Calories', 'Protein', 'Fats', 'Carbs', 'image_url',"likes"]
+#     def get_LinkDrive(self, obj):
+#         request = self.context.get('request')
+#         if obj.LinkDrive and hasattr(obj.LinkDrive, 'url'):
+#             return request.build_absolute_uri(obj.LinkDrive.url)
+#         return None
 class FoodsSerializer(serializers.ModelSerializer):
     likes = UserSerializer(many=True, read_only=True)
-    # image_url = serializers.SerializerMethodField()
+    LinkDrive = serializers.SerializerMethodField()
 
     class Meta:
         model = Foods
-        fields='__all__'
-        # fields = ["id", 'FoodName', 'TheDescription', 'YoutubeLink',
-        #           'Calories', 'Protein', 'Fats', 'Carbs', 'image_url',"likes"]
+        fields = '__all__'
 
-    # def get_image_url(self, obj):
-    #     request = self.context.get('request')
-    #     if obj.LinkDrive:
-    #         return request.build_absolute_uri(settings.MEDIA_URL + obj.LinkDrive)
-    #     return None
+    def get_LinkDrive(self, obj):
+        request = self.context.get('request')
+        if request and hasattr(request, 'build_absolute_uri'):
+            return request.build_absolute_uri(obj.LinkDrive.url)
+        return None
