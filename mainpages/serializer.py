@@ -48,15 +48,16 @@ class UserSerializer(serializers.ModelSerializer):
 
 class FoodsSerializer(serializers.ModelSerializer):
     likes = UserSerializer(many=True, read_only=True)
-    image_url = serializers.SerializerMethodField()
+    # image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Foods
-        fields = ['FoodName', 'TheDescription', 'YoutubeLink',
-                  'Calories', 'Protein', 'Fats', 'Carbs', 'image_url',"likes"]
+        fields='__all__'
+        # fields = ["id", 'FoodName', 'TheDescription', 'YoutubeLink',
+        #           'Calories', 'Protein', 'Fats', 'Carbs', 'image_url',"likes"]
 
-    def get_image_url(self, obj):
-        request = self.context.get('request')
-        if obj.LinkDrive:
-            return request.build_absolute_uri(settings.MEDIA_URL + obj.LinkDrive)
-        return None
+    # def get_image_url(self, obj):
+    #     request = self.context.get('request')
+    #     if obj.LinkDrive:
+    #         return request.build_absolute_uri(settings.MEDIA_URL + obj.LinkDrive)
+    #     return None
