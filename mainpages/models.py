@@ -36,6 +36,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     weight = models.FloatField(blank=True, null=True)
     height = models.FloatField(blank=True, null=True)
     ideal_weight = models.FloatField(blank=True, null=True)
+    calories = models.FloatField(blank=True, null=True)
+
     activity = models.CharField(max_length=255, blank=True, null=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -63,7 +65,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Foods(models.Model):
     FoodName = models.CharField(max_length=200, unique=True)
     # LinkDrive = models.ImageField(upload_to='foods_images/')
-    LinkDrive = models.CharField(max_length=500,default='Images/bagel.jpg')
+    LinkDrive = models.CharField(max_length=500, default='Images/bagel.jpg')
     TheDescription = models.CharField(max_length=400, default=0)
     YoutubeLink = models.CharField(max_length=200, default=0)
 

@@ -225,6 +225,7 @@ class GetUserInfoView(APIView):
                 'weight': user.weight,
                 'height': user.height,
                 'ideal_weight': user.ideal_weight,
+                'calories':user.calories,
                 'activity': user.activity,
             }
             return Response(user_data, status=status.HTTP_200_OK)
