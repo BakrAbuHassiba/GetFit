@@ -110,6 +110,11 @@ class generics_food_list(generics.ListAPIView):
     queryset = Foods.objects.all()
     serializer_class = FoodsSerializer
 
+    def get_serializer_context(self):
+        context = super(generics_food_list, self).get_serializer_context()
+        context.update({"request": self.request})
+        return context
+
 
 ACTIVITY_FACTORS = {
     "high": 1.75,

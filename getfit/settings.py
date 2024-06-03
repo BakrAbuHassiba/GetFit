@@ -1,10 +1,8 @@
-
 import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-818u-5jf81e-7e!gg#nukat!%wqqswzpvgudl63%acc9$^t)14'
@@ -14,8 +12,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Use os.path for consistency with MEDIA_ROOT
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MEDIA_URL = '/media/'
-APPEND_SLASH = True
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Application definition
@@ -34,7 +33,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
 ]
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -74,7 +72,7 @@ WSGI_APPLICATION = 'getfit.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
