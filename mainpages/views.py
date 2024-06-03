@@ -163,6 +163,7 @@ class CalculateCalories(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             ideal_weight = round(ideal_weight, 2)
+            calories = round(calories, 2)
 
             # Save to user profile
             try:
