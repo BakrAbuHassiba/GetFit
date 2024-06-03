@@ -195,6 +195,22 @@ class GetImageView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
+class GetUserInfoView(APIView):
+    def get(self, request, id):
+        try:
+            user = User.objects.get(id=id)
+            # image_url = user.image.url if user.image else None
+            user_data = {
+                'gender': user.gender,
+                'weight': user.weight,
+                'height': user.height,
+                'ideal_weight': user.ideal_weight,
+                'activity': user.activity,
+            }
+            return Response(user_data, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
 
 class GetFoodByFoodName(APIView):
     def get(self, request, FoodName):
