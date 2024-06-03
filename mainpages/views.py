@@ -131,6 +131,7 @@ GENDER_FACTOR = {
 class CalculateCalories(APIView):
     def post(self, request):
         try:
+            user_id = request.data["user_id"]
             weight = float(request.data["weight"])
             height_cm = float(request.data["height"])
             activity = request.data["activity"].lower()
@@ -162,13 +163,31 @@ class CalculateCalories(APIView):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             ideal_weight = round(ideal_weight, 2)
+
+            # Save to user profile
+            try:
+                user = User.objects.get(id=user_id)
+                user.weight = weight
+                user.height = height_cm
+                user.activity = activity
+                user.gender = gender
+                user.calories = calories
+                user.ideal_weight = ideal_weight
+                user.save()
+            except User.DoesNotExist:
+                return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
             response_data = {
                 "calories": calories,
                 "ideal_weight": ideal_weight
             }
+            return Response(response_data, status=status.HTTP_200_OK)
 
-            return Response(response_data, status=status.HTTP_201_CREATED)
-
+        except (ValueError, KeyError):
+            return Response(
+                "Invalid input. Please check data types and format.",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         except (ValueError, KeyError):
             return Response(
                 "Invalid input. Please check data types and format.",

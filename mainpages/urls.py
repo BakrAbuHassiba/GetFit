@@ -1,7 +1,7 @@
 from django.urls import path
 # from rest_framework import routers
 # from django.conf.urls import include
-from .views import delete_all_foods, delete_user_likes, UpdateProfileImageView, GetImageView, like_food, generics_food_list, GetFoodByFoodName, LoginView, UserView, LogoutView, RegisterView,  generics_pk, generics_list, CalculateCalories, GetUsernameView, FoodsSearchView, user_liked_foods
+from .views import GetUserInfoView, delete_all_foods, delete_user_likes, UpdateProfileImageView, GetImageView, like_food, generics_food_list, GetFoodByFoodName, LoginView, UserView, LogoutView, RegisterView,  generics_pk, generics_list, CalculateCalories, GetUsernameView, FoodsSearchView, user_liked_foods
 from django.conf import settings
 from django.conf.urls.static import static
 # router = routers.DefaultRouter()
@@ -16,6 +16,8 @@ urlpatterns = [
     path('get/', generics_list.as_view(), name='get_users'),
     path('CalculateCalories/', CalculateCalories.as_view()),
     path('GetUsernameView/<str:username>/', GetUsernameView.as_view()),
+    path('GetUserInfo/<int:id>/', GetUserInfoView.as_view()),
+    
     path('get-foods/', generics_food_list.as_view(), name='get-foods'),
     path('GetFoodView/<str:FoodName>/', GetFoodByFoodName.as_view()),
     path('foods/', FoodsSearchView.as_view()),
