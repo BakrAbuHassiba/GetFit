@@ -30,15 +30,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=255, unique=True, db_index=True)
     email = models.EmailField(
         max_length=255, unique=True, db_index=True, blank=True, null=True)
-    image = models.ImageField(default='default.jpg',
-                              upload_to='images', blank=True, null=True)
-    gender = models.CharField(max_length=6, blank=True, null=True)
-    weight = models.FloatField(blank=True, null=True)
-    height = models.FloatField(blank=True, null=True)
-    ideal_weight = models.FloatField(blank=True, null=True)
-    calories = models.FloatField(blank=True, null=True)
+    image = models.ImageField(
+        upload_to='images', blank=True, null=True)
+    gender = models.CharField(max_length=6, blank=True,
+                              null=True, default="...")
+    weight = models.FloatField(blank=True, null=True, default="...")
+    height = models.FloatField(blank=True, null=True, default="...")
+    ideal_weight = models.FloatField(blank=True, null=True, default="...")
+    calories = models.FloatField(blank=True, null=True, default="...")
 
-    activity = models.CharField(max_length=255, blank=True, null=True)
+    activity = models.CharField(
+        max_length=255, blank=True, null=True, default="...")
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)

@@ -1,11 +1,5 @@
 from django.urls import path
-# from rest_framework import routers
-# from django.conf.urls import include
 from .views import DeleteUserDataView, GetUserInfoView, delete_all_foods, delete_user_likes, UpdateProfileImageView, GetImageView, like_food, generics_food_list, GetFoodByFoodName, LoginView, UserView, LogoutView, RegisterView,  generics_pk, generics_list, CalculateCalories, GetUsernameView, FoodsSearchView, user_liked_foods
-# from django.conf import settings
-# from django.conf.urls.static import static
-# router = routers.DefaultRouter()
-# router.register('foods', FoodsListView)
 
 urlpatterns = [
     path('login/', LoginView.as_view()),
@@ -33,7 +27,3 @@ urlpatterns = [
     path('delete-all-foods/', delete_all_foods, name='delete-all-foods'),
 
 ]
-
-# if settings.DEBUG:
-#     urlpatterns += static(settings.MEDIA_URL,
-#                           document_root=settings.MEDIA_ROOT)
