@@ -1,3 +1,4 @@
+from django.conf import settings
 from .models import Foods, User
 from .serializer import FoodsSerializer, UserSerializer, RegisterSerializer
 from rest_framework import status, generics
@@ -19,39 +20,74 @@ class FoodsSearchView(generics.ListAPIView):
     search_fields = ['FoodName']
 
 
+# class LoginView(APIView):
+#     def post(self, request):
+#         username = request.data['username']
+#         password = request.data['password']
+
+#         user = User.objects.filter(username=username).first()
+#         id = user.id
+#         image=user.image
+#         if user is None:
+#             raise AuthenticationFailed('User not found!')
+
+#         # if user.username != username:
+#         #     raise AuthenticationFailed('Incorrect Email or Password!')
+#         if not user.check_password(password):
+#             raise AuthenticationFailed('Incorrect Email or Password!')
+#         payload = {
+#             'id': user.id,
+#             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
+#             'iat': datetime.datetime.utcnow()
+#         }
+
+#         token = jwt.encode(payload, 'secret',
+#                            algorithm='HS256')
+#         response = Response()
+
+#         response.set_cookie(key='jwt', value=token, httponly=True)
+#         response.data = {
+#             'jwt': token,
+#             'username': username,
+#             "id": id,
+#             "image":image
+#         }
+        
+#         return response
+
+
 class LoginView(APIView):
     def post(self, request):
         username = request.data['username']
         password = request.data['password']
 
         user = User.objects.filter(username=username).first()
-        id = user.id
         if user is None:
             raise AuthenticationFailed('User not found!')
 
-        # if user.username != username:
-        #     raise AuthenticationFailed('Incorrect Email or Password!')
         if not user.check_password(password):
             raise AuthenticationFailed('Incorrect Email or Password!')
+
         payload = {
             'id': user.id,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
             'iat': datetime.datetime.utcnow()
         }
 
-        token = jwt.encode(payload, 'secret',
-                           algorithm='HS256')
+        token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
         response = Response()
-
         response.set_cookie(key='jwt', value=token, httponly=True)
+
+        image_url = user.image.url if user.image else None
+
         response.data = {
             'jwt': token,
             'username': username,
-            "id": id
+            'id': user.id,
+            'image': image_url
         }
+
         return response
-
-
 class UserView(APIView):
 
     def get(self, request):
