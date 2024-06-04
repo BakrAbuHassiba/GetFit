@@ -33,14 +33,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     image = models.ImageField(
         upload_to='images', blank=True, null=True)
     gender = models.CharField(max_length=6, blank=True,
-                              null=True, default="...")
-    weight = models.FloatField(blank=True, null=True, default="000")
-    height = models.FloatField(blank=True, null=True, default="000")
-    ideal_weight = models.FloatField(blank=True, null=True, default="000")
-    calories = models.FloatField(blank=True, null=True, default="000")
+                              null=True)
+    weight = models.FloatField(blank=True, null=True)
+    height = models.FloatField(blank=True, null=True)
+    ideal_weight = models.FloatField(blank=True, null=True)
+    calories = models.FloatField(blank=True, null=True)
 
     activity = models.CharField(
-        max_length=255, blank=True, null=True, default="...")
+        max_length=255, blank=True, null=True)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
