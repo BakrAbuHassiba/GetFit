@@ -34,10 +34,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         upload_to='images', blank=True, null=True)
     gender = models.CharField(max_length=6, blank=True,
                               null=True, default="...")
-    weight = models.FloatField(blank=True, null=True, default="...")
-    height = models.FloatField(blank=True, null=True, default="...")
-    ideal_weight = models.FloatField(blank=True, null=True, default="...")
-    calories = models.FloatField(blank=True, null=True, default="...")
+    weight = models.FloatField(blank=True, null=True, default="000")
+    height = models.FloatField(blank=True, null=True, default="000")
+    ideal_weight = models.FloatField(blank=True, null=True, default="000")
+    calories = models.FloatField(blank=True, null=True, default="000")
 
     activity = models.CharField(
         max_length=255, blank=True, null=True, default="...")
