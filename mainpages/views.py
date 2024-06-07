@@ -1,5 +1,5 @@
 from django.conf import settings
-from .models import Foods, User
+from .models import Food, User
 from .serializer import FoodsSerializer, UserSerializer, RegisterSerializer
 from rest_framework import status, generics
 from rest_framework.response import Response
@@ -12,72 +12,31 @@ from rest_framework import filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 
-class FoodsSearchView(generics.ListAPIView):
-    queryset = Foods.objects.all()
+class RecipesSearchView(generics.ListAPIView):
+    queryset = Food.objects.all()
     serializer_class = FoodsSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['FoodName']
     search_fields = ['FoodName']
 
 
-# class LoginView(APIView):
-#     def post(self, request):
-#         username = request.data['username']
-#         password = request.data['password']
-
-#         user = User.objects.filter(username=username).first()
-#         id = user.id
-#         image=user.image
-#         if user is None:
-#             raise AuthenticationFailed('User not found!')
-
-#         # if user.username != username:
-#         #     raise AuthenticationFailed('Incorrect Email or Password!')
-#         if not user.check_password(password):
-#             raise AuthenticationFailed('Incorrect Email or Password!')
-#         payload = {
-#             'id': user.id,
-#             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
-#             'iat': datetime.datetime.utcnow()
-#         }
-
-#         token = jwt.encode(payload, 'secret',
-#                            algorithm='HS256')
-#         response = Response()
-
-#         response.set_cookie(key='jwt', value=token, httponly=True)
-#         response.data = {
-#             'jwt': token,
-#             'username': username,
-#             "id": id,
-#             "image":image
-#         }
-        
-#         return response
-
-
 class LoginView(APIView):
     def post(self, request):
         username = request.data['username']
         password = request.data['password']
-
         user = User.objects.filter(username=username).first()
         if user is None:
             raise AuthenticationFailed('User not found!')
-
         if not user.check_password(password):
             raise AuthenticationFailed('Incorrect Email or Password!')
-
         payload = {
             'id': user.id,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
             'iat': datetime.datetime.utcnow()
         }
-
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
         response = Response()
         response.set_cookie(key='jwt', value=token, httponly=True)
-
         image_url = user.image.url if user.image else None
 
         response.data = {
@@ -86,24 +45,23 @@ class LoginView(APIView):
             'id': user.id,
             'image': image_url
         }
-
         return response
-class UserView(APIView):
+# class UserView(APIView):
 
-    def get(self, request):
-        token = request.COOKIES.get('jwt')
+#     def get(self, request):
+#         token = request.COOKIES.get('jwt')
 
-        if not token:
-            raise AuthenticationFailed('Unauthenticated!')
+#         if not token:
+#             raise AuthenticationFailed('Unauthenticated!')
 
-        try:
-            payload = jwt.decode(token, 'secret', algorithms=['HS256'])
-        except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed('Unauthenticated!')
+#         try:
+#             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
+#         except jwt.ExpiredSignatureError:
+#             raise AuthenticationFailed('Unauthenticated!')
 
-        user = User.objects.filter(id=payload['id']).first()
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
+#         user = User.objects.filter(id=payload['id']).first()
+#         serializer = UserSerializer(user)
+#         return Response(serializer.data)
 
 
 class LogoutView(APIView):
@@ -126,33 +84,16 @@ class RegisterView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        # user_data = serializer.data
-        # user = User.objects.get(email=user_data['email'])
-        # return Response(user, status=status.HTTP_201_CREATED)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
-class generics_list(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
 
-
-class generics_pk(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-
-class generics_food_list(generics.ListAPIView):
-    queryset = Foods.objects.all()
+class GetRecipes(generics.ListAPIView):
+    queryset = Food.objects.all()
     serializer_class = FoodsSerializer
-    
+
     def get_serializer_context(self):
         return {'request': self.request}
-
-    # def get_serializer_context(self):
-    #     context = super(generics_food_list, self).get_serializer_context()
-    #     context.update({"request": self.request})
-    #     return context
 
 
 ACTIVITY_FACTORS = {
@@ -160,7 +101,6 @@ ACTIVITY_FACTORS = {
     "normal": 1.5,
     "low": 1.2,
 }
-
 GENDER_FACTOR = {
     'male': 1,
     'female': 0.9
@@ -186,11 +126,7 @@ class CalculateCalories(APIView):
             gender_factor = GENDER_FACTOR.get(gender, 1)
 
             calories = 24 * activity_factor * weight * gender_factor
-
-            # Convert height from cm to inches
             height_in = height_cm / 2.54
-
-            # Calculate ideal weight
             if gender == 'male':
                 ideal_weight = 50 + 2.3 * \
                     (height_in - 60)  # 60 inches = 5 feet
@@ -203,8 +139,6 @@ class CalculateCalories(APIView):
                 )
             ideal_weight = round(ideal_weight, 2)
             calories = round(calories, 2)
-
-            # Save to user profile
             try:
                 user = User.objects.get(id=user_id)
                 user.weight = weight
@@ -216,7 +150,6 @@ class CalculateCalories(APIView):
                 user.save()
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
             response_data = {
                 "calories": calories,
                 "ideal_weight": ideal_weight
@@ -245,7 +178,6 @@ class DeleteUserDataView(APIView):
             except User.DoesNotExist:
                 return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
-            # Set the fields to None or appropriate default values
             user.weight = None
             user.height = None
             user.activity = None
@@ -267,10 +199,11 @@ class DeleteUserDataView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+
 class GetUsernameView(APIView):
-    def get(self, request, username):
+    def get(self, request, user_id):
         try:
-            user = User.objects.get(username=username)
+            user = User.objects.get(id=user_id)
             username = user.username
             return Response(username)
         except User.DoesNotExist:
@@ -286,6 +219,7 @@ class GetImageView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
+
 class GetUserInfoView(APIView):
     def get(self, request, id):
         try:
@@ -296,7 +230,7 @@ class GetUserInfoView(APIView):
                 'weight': user.weight,
                 'height': user.height,
                 'ideal_weight': user.ideal_weight,
-                'calories':user.calories,
+                'calories': user.calories,
                 'activity': user.activity,
             }
             return Response(user_data, status=status.HTTP_200_OK)
@@ -304,52 +238,22 @@ class GetUserInfoView(APIView):
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
-class GetFoodByFoodName(APIView):
+class GetRecipesByRecipeName(APIView):
     def get(self, request, FoodName):
         try:
-            food = Foods.objects.get(FoodName=FoodName)
+            food = Food.objects.get(FoodName=FoodName)
             serializer = FoodsSerializer(food)
             return Response(serializer.data)
-        except Foods.DoesNotExist:
+        except Food.DoesNotExist:
             return Response({'error': 'Food not found'}, status=404)
 
 
-# @api_view(['POST'])
-# def like_food(request, food_id, user_id):
-#     try:
-#         food = Foods.objects.get(pk=food_id)
-#         user = User.objects.get(pk=user_id)
-#     except (Foods.DoesNotExist, User.DoesNotExist):
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-
-#     if user in food.likes.all():
-#         food.likes.remove(user)
-#         message = 'You have unliked this food.'
-#     else:
-#         food.likes.add(user)
-#         message = 'You have liked this food.'
-
-#     food.save()
-#     serializer = FoodsSerializer(food)
-#     return Response({'message': message, 'food': serializer.data}, status=status.HTTP_200_OK)
-
-
-# @api_view(['GET'])
-# def user_liked_foods(request, user_id):
-#     try:
-#         user = User.objects.get(pk=user_id)
-#     except User.DoesNotExist:
-#         return Response(status=status.HTTP_404_NOT_FOUND)
-
-#     liked_foods = Foods.objects.filter(likes=user)
-#     serializer = FoodsSerializer(liked_foods, many=True)
-#     return Response(serializer.data, status=status.HTTP_200_OK)
 @api_view(['POST'])
-def like_food(request, food_id, user_id):
+def like_recipe(request, food_id, user_id):
     try:
-        food = Foods.objects.get(pk=food_id)
+        food = Food.objects.get(pk=food_id)
         user = User.objects.get(pk=user_id)
-    except (Foods.DoesNotExist, User.DoesNotExist):
+    except (Food.DoesNotExist, User.DoesNotExist):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if user in food.likes.all():
@@ -365,13 +269,13 @@ def like_food(request, food_id, user_id):
 
 
 @api_view(['GET'])
-def user_liked_foods(request, user_id):
+def user_liked_recipes(request, user_id):
     try:
         user = User.objects.get(pk=user_id)
     except User.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
-    liked_foods = Foods.objects.filter(likes=user)
+    liked_foods = Food.objects.filter(likes=user)
     serializer = FoodsSerializer(
         liked_foods, many=True, context={'request': request})
     return Response(serializer.data, status=status.HTTP_200_OK)
@@ -403,7 +307,7 @@ def delete_user_likes(request, user_id):
     except User.DoesNotExist:
         return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    liked_foods = Foods.objects.filter(likes=user)
+    liked_foods = Food.objects.filter(likes=user)
     for food in liked_foods:
         food.likes.remove(user)
         food.save()
@@ -412,8 +316,8 @@ def delete_user_likes(request, user_id):
 
 
 @api_view(['DELETE'])
-def delete_all_foods(request):
-    foods = Foods.objects.all()
+def delete_all_recipes(request):
+    foods = Food.objects.all()
     for food in foods:
         food.likes.clear()  # Clear related likes
         food.delete()

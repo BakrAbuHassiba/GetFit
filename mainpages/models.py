@@ -64,7 +64,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.email
 
 
-class Foods(models.Model):
+class Food(models.Model):
     FoodName = models.CharField(max_length=200, unique=True)
     LinkDrive = models.ImageField(
         upload_to='foods_images/', default='foods_images/bagel.jpg')

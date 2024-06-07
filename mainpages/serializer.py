@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from .models import Foods, User
-from django.conf import settings
+from .models import Food, User
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -41,32 +40,15 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        # fields = ('id', 'email', 'username',
-        #           'password', 'gender', 'weight', 'activity')
         fields = "__all__"
         extra_kwargs = {'password': {'write_only': True, 'required': True}}
 
-
-# class FoodsSerializer(serializers.ModelSerializer):
-#     likes = UserSerializer(many=True, read_only=True)
-#     LinkDrive = serializers.SerializerMethodField()
-
-#     class Meta:
-#         model = Foods
-#         fields='__all__'
-#         # fields = ["id", 'FoodName', 'TheDescription', 'YoutubeLink',
-#         #           'Calories', 'Protein', 'Fats', 'Carbs', 'image_url',"likes"]
-#     def get_LinkDrive(self, obj):
-#         request = self.context.get('request')
-#         if obj.LinkDrive and hasattr(obj.LinkDrive, 'url'):
-#             return request.build_absolute_uri(obj.LinkDrive.url)
-#         return None
 class FoodsSerializer(serializers.ModelSerializer):
     likes = UserSerializer(many=True, read_only=True)
     LinkDrive = serializers.SerializerMethodField()
 
     class Meta:
-        model = Foods
+        model = Food
         fields = '__all__'
 
     def get_LinkDrive(self, obj):
@@ -74,3 +56,4 @@ class FoodsSerializer(serializers.ModelSerializer):
         if request and hasattr(request, 'build_absolute_uri'):
             return request.build_absolute_uri(obj.LinkDrive.url)
         return None
+
