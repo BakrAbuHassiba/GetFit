@@ -46,24 +46,6 @@ class LoginView(APIView):
             'image': image_url
         }
         return response
-# class UserView(APIView):
-
-#     def get(self, request):
-#         token = request.COOKIES.get('jwt')
-
-#         if not token:
-#             raise AuthenticationFailed('Unauthenticated!')
-
-#         try:
-#             payload = jwt.decode(token, 'secret', algorithms=['HS256'])
-#         except jwt.ExpiredSignatureError:
-#             raise AuthenticationFailed('Unauthenticated!')
-
-#         user = User.objects.filter(id=payload['id']).first()
-#         serializer = UserSerializer(user)
-#         return Response(serializer.data)
-
-
 class LogoutView(APIView):
     def post(self, request):
         response = Response()
@@ -322,3 +304,4 @@ def delete_all_recipes(request):
         food.likes.clear()  # Clear related likes
         food.delete()
     return Response({'message': 'All foods have been deleted.'}, status=status.HTTP_200_OK)
+
