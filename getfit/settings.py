@@ -5,8 +5,7 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-818u-5jf81e-7e!gg#nukat!%wqqswzpvgudl63%acc9$^t)14'
-
+SECRET_KEY = os.environ.get('SECRET_KEY', 'default-secret')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -121,3 +120,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
